@@ -1,0 +1,129 @@
+{% load staticfiles %}
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Bins</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <style>
+      
+      #map {
+        height: 70%;
+        width: 70%;
+      }
+      
+      html, body {
+        height: 100%;
+        margin: 10px;
+        padding: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="map"></div>
+    <script>
+      function initMap() {
+
+        
+        var styledMapType = new google.maps.StyledMapType(
+            [
+              {
+            featureType: 'poi',
+            stylers: [{visibility: 'off'}]
+          },
+          {
+            featureType: 'transit',
+            
+            stylers: [{visibility: 'off'}]
+          },
+          {
+            featureType: 'administrative',
+            
+            stylers: [{visibility: 'off'}]
+          },
+          {
+            featureType: 'administrative',
+            
+            stylers: [{visibility: 'off'}]
+          }
+            ],
+            {name: 'Styled Map'});
+
+        
+        var map = new google.maps.Map(document.getElementById('map'), {
+          center: {lat:  9.9252007, lng: 78.1197754},
+          zoom: 11,
+          mapTypeControlOptions: {
+            mapTypeIds: ['roadmap', 'satellite', 'hybrid', 'terrain',
+                    'styled_map']
+          }
+        });
+
+
+        var green_icon = {
+          url: "http://127.0.0.1:8000/smartbin/green",
+          size: new google.maps.Size(20, 32),
+          origin: new google.maps.Point(0, 0),
+          anchor: new google.maps.Point(0, 32)
+        };
+
+        var red_icon = {
+          url: "http://127.0.0.1:8000/smartbin/red",
+          size: new google.maps.Size(20, 32),
+          origin: new google.maps.Point(0, 0),
+          anchor: new google.maps.Point(0, 32)
+        };
+
+        var yellow_icon = {
+          url: "http://127.0.0.1:8000/smartbin/yellow",
+          size: new google.maps.Size(20, 32),
+          origin: new google.maps.Point(0, 0),
+          anchor: new google.maps.Point(0, 32)
+        };
+ 
+        var shape = {
+          coords: [1, 1, 1, 20, 18, 20, 18, 1],
+          type: 'poly'
+        };
+
+        {% for marker in datas %}
+          var values = []
+          {% for key,values in marker.items %}
+              values.push({{ values }})
+          {% endfor %}        
+
+          alert(values[1]);
+          var icons = ["green_icon","yellow_icon","red_icon"];
+          var flag = 0;
+          if(values[1] > 50 && values[1] < 80)
+          {
+            flag = 1;
+          }
+          else if(values[1] > 80)
+          {
+            flag = 2;
+          }
+
+          var marker = new google.maps.Marker(
+            {
+              position: {lat: values[0], lng: values[3]},
+              
+              icon: icons[flag],
+              shape: shape,
+              map: map,
+              title:values[2],
+
+            });
+                        
+        {% endfor %}
+
+
+        map.mapTypes.set('styled_map', styledMapType);
+        map.setMapTypeId('styled_map');
+      }
+    </script>
+    <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCVpPuA83bREEa2sFrkV7m_b-HI82AIG4k&callback=initMap">
+    </script>
+  </body>
+</html>
